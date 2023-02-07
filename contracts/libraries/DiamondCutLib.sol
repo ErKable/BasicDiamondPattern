@@ -26,7 +26,7 @@ library DiamondCutLib {
     error cannotReplaceSelectorsFromZeroAddress(FacetCut diamondCut);
     error IncorrectAction(FacetCut diamondCut);
 
-    function diamondCut(FacetCut memory diamondCut) internal {
+    function _diamondCut(FacetCut memory diamondCut) internal {
         if(diamondCut.action == FacetCuAction.Add){
             addFunction(diamondCut);
         } else if(diamondCut.action == FacetCuAction.Replace){
@@ -49,7 +49,8 @@ library DiamondCutLib {
             }
             if(ds.selectorToAddress[diamondCut.functionSelectors[i]] != address(0)){
                 revert functionSelectorAlreadyExisting(diamondCut.functionSelectors[i]);
-            }          
+            }
+            _enforceHasContractCode(diamondCut.facetAddress, "No facet implementation");          
             ds.selectorToAddress[diamondCut.functionSelectors[i]] = diamondCut.facetAddress;
             ds.addressToSelectors[diamondCut.facetAddress].push(diamondCut.functionSelectors[i]);
             ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]] = ds.addressToSelectors[diamondCut.facetAddress].length;
@@ -100,7 +101,13 @@ library DiamondCutLib {
     }
 
 
-
+    function _enforceHasContractCode(address _contract, string memory _errorMessage) private view {
+        uint256 contractSize;
+        assembly {
+            contractSize := extcodesize(_contract)
+        }
+        require(contractSize > 0, _errorMessage);
+    }
 
 
 }
