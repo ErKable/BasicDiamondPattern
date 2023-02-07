@@ -51,6 +51,8 @@ library DiamondCutLib {
                 revert functionSelectorAlreadyExisting(diamondCut.functionSelectors[i]);
             }          
             ds.selectorToAddress[diamondCut.functionSelectors[i]] = diamondCut.facetAddress;
+            ds.addressToSelectors[diamondCut.facetAddress].push(diamondCut.functionSelectors[i]);
+            ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]] = ds.addressToSelectors[diamondCut.facetAddress].length;
             emit DiamondCut(diamondCut);
         }
     }
@@ -67,7 +69,10 @@ library DiamondCutLib {
             if(ds.selectorToAddress[diamondCut.functionSelectors[i]] == address(0)){
                 revert UnexistingFunctionSelector(diamondCut.functionSelectors[i]);
             }
-            ds.selectorToAddress[diamondCut.functionSelectors[i]] = address(0);
+            delete ds.selectorToAddress[diamondCut.functionSelectors[i]];
+            uint oldPosition = ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]];
+            delete ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]];
+            delete ds.addressToSelectors[diamondCut.facetAddress][oldPosition];
             emit DiamondCut(diamondCut);          
         }
     }
@@ -85,6 +90,11 @@ library DiamondCutLib {
                 revert UnexistingFunctionSelector(diamondCut.functionSelectors[i]);
             }
             ds.selectorToAddress[diamondCut.functionSelectors[i]] = diamondCut.facetAddress;
+            uint oldPosition = ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]];
+            delete ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]];
+            delete ds.addressToSelectors[diamondCut.facetAddress][oldPosition];
+            ds.addressToSelectors[diamondCut.facetAddress].push(diamondCut.functionSelectors[i]);
+            ds.addressToSelectorToPosition[diamondCut.facetAddress][diamondCut.functionSelectors[i]] = ds.addressToSelectors[diamondCut.facetAddress].length;
             emit DiamondCut(diamondCut); 
         }
     }
