@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 import {DiamondStorage as dsto} from "./DiamondStorage.sol";
 library OwnershipLib{
 
-    error NotTheOwner(address indexed user, address indexed contractOwner);
+    error NotTheOwner(address user, address contractOwner);
 
     event OwnershipTransferred(address indexed from, address indexed to);
 

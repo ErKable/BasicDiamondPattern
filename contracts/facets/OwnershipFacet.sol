@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.13;
 
-import {DiamondStorage as dsto} from "../libraries/DiamondStorage.sol";
 import {OwnershipLib as lib} from "../libraries/OwnershipLib.sol";
 
 contract OwnershipFacet{
