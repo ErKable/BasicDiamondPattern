@@ -7,7 +7,7 @@ library DiamondStorage{
     bytes32 constant STORAGE_POSITION = keccak256("My.Storage.Position");
      
     struct DStorage{
-        mapping(bytes4 => address) selectorToAddress;
+        mapping(bytes4 => address) selectorToAddress; //Selector to facet address
         address contractOwner;
     }
 
