@@ -11,7 +11,7 @@ contract OwnershipFacet{
         lib.setContractOwner(newOwner);
     }
 
-    function owner() external view returns(address owner){
-        owner = lib.getOwner();
+    function owner() external view returns(address _owner){
+        _owner = lib.getOwner();
     }
 }

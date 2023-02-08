@@ -6,8 +6,8 @@ import {DiamondCutLib as dcl} from "../libraries/DiamondCutLib.sol";
 import {OwnershipLib as ol} from "../libraries/OwnershipLib.sol";
 contract DiamondCutFacet {
 
-    function diamondCut(dcl.FacetCut calldata diamondCut) external {
+    function diamondCut(dcl.FacetCut calldata _diamondCut) external {
         ol.checkOwnership();
-        dcl._diamondCut(diamondCut);
+        dcl._diamondCut(_diamondCut);
     }   
 }
