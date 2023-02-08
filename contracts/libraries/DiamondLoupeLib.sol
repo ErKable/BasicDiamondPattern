@@ -31,6 +31,16 @@ library DiamondLoupeLib{
         return facets;
     }
 
+    function _getFacetAddress(bytes4 functionSelector) internal view returns(address facetAddress){
+        dsto.DStorage storage ds = dsto.getStorage();
+        facetAddress = ds.selectorToAddress[functionSelector];
+    }
+
+    function _getFunctionSelectors(address facet) internal view returns(bytes4[] memory functionSelectors){
+        dsto.DStorage storage ds = dsto.getStorage();
+        functionSelectors = ds.addressToSelectors[facet];
+    }
+
 
 
 }

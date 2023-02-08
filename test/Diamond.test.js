@@ -144,11 +144,38 @@ describe(`Simple Diamond Contract Test`, function(){
         diamondAddress = diamond.address
         console.log(`Diamond deployed to: ${diamondAddress}`)
     })
-    it(`Should call the getOwner() function`, async function(){
+    //Testing the ownership facet
+    it(`Should call the owner() function`, async function(){
         const ownFac = await ethers.getContractAt('OwnershipFacet', diamondAddress)
         let retrievedOwner = await ownFac.owner()
         console.log(`Retrieved owner: ${retrievedOwner}`)
         console.log(`Owner: ${ownerAddress}`)
         expect(retrievedOwner).to.equal(ownerAddress)
     })
+    it(`Should transfer the ownership`, async function(){
+        const ownFac = await ethers.getContractAt('OwnershipFacet', diamondAddress)
+        let oldOwner = await ownFac.owner()
+        console.log(`Actual owner: ${oldOwner}`)
+
+        let newOwner = ethers.provider.getSigner(1)
+        let newOwnerAddress = await newOwner.getAddress()
+        console.log(`Future owner address: ${newOwnerAddress}`)
+
+        await ownFac.transferOwnership(newOwnerAddress)
+        console.log(`Ownership transferred`)
+
+        let retrievedOwner = await ownFac.owner()
+        console.log(`Retrieved owner: ${retrievedOwner}`)
+        expect(oldOwner).to.not.equal(retrievedOwner)
+
+        await expect(ownFac.connect(owner).transferOwnership(ownerAddress)).to.revertedWith('NotTheOwner')
+        console.log(`Operation reverted successfully!`)
+
+        await ownFac.connect(newOwner).transferOwnership(ownerAddress)
+        let lastOwner = await ownFac.owner()
+        console.log(`Ownership transferred again to: ${lastOwner}`)
+        expect(lastOwner).to.equal(ownerAddress)
+    })
+    //testing diamond loupe facet
+    
 })
