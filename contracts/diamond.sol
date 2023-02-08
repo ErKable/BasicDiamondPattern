@@ -9,16 +9,14 @@ contract Diamond {
 
 
     constructor(dcl.FacetCut[] memory diamondCuts) {
-        ol.setContractOwner(msg.sender);
-        for(uint i = 0; i < diamondCuts.length; ++i){
-            dcl._diamondCut(diamondCuts[i]);
-        }
+        ol.setContractOwner(msg.sender);       
+        dcl._diamondCut(diamondCuts);        
     }
 
     fallback() external payable{
         dsl.DStorage storage ds = dsl.getStorage();
         //retrieving facet address
-        address facet = ds.selectorToAddress[msg.sig];
+        address facet = ds.facetAddressAndSelectorPosition[msg.sig].facetAddress;
         if(facet == address(0)){
             revert dcl.UnexistingFunctionSelector(msg.sig);
         }

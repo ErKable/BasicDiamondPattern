@@ -1,4 +1,4 @@
-const { expect } = require('chai')
+const { expect, assert } = require('chai')
 const { ethers } = require("hardhat");
 // HELPER: get function selectors from a contract
 function getSelectors (contract) {
@@ -177,5 +177,30 @@ describe(`Simple Diamond Contract Test`, function(){
         expect(lastOwner).to.equal(ownerAddress)
     })
     //testing diamond loupe facet
-    
+    it(`Should call getFacetAddress() from the DiamondLoupe`, async function(){
+        const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress);
+        let facetAddress = await diamLoupe.getFacetAddress(0x8da5cb5b)
+        console.log(`Function "0x8da5cb5b" is from ${facetAddress}`)
+        expect(facetAddress).to.equal(ownershipFacetAddress)
+    })
+    it(`Should call getFacetsAddresses() from the DiamondLoupe`, async function(){
+        const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress);
+        
+        let ownerShipselectors = await diamLoupe.getFunctionSelectors(ownershipFacetAddress)
+        console.log(`Ownership selectors: ${ownerShipselectors}`)        
+        assert.sameMembers(ownerShipselectors, ownershipFacetSelectors)
+
+        let diamondLoupeSelectors = await diamLoupe.getFunctionSelectors(diamondLoupeFacetAddress)
+        console.log(`Diamond Loupe selectors: ${diamondLoupeSelectors}`)
+        assert.sameMembers(diamondLoupeSelectors, diamondLoupeFacetSelectors)
+
+        let diamondCutSelectors = await diamLoupe.getFunctionSelectors(diamondCutFacetAddress)
+        console.log(`Diamond Cut selectors ${diamondCutSelectors}`)
+        assert.sameMembers(diamondCutSelectors, diamondCutFacetSelectors)
+    })
+    it(`Should call the getFacets() from the DiamondLoupe`, async function(){
+        const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress);
+        let facets = await diamLoupe.getFacets()
+        console.log(facets)
+    })
 })
