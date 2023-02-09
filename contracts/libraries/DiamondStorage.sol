@@ -15,13 +15,8 @@ library DiamondStorage{
         
         mapping(bytes4 => FacetAddressAndSelectorPosition) facetAddressAndSelectorPosition;
         bytes4[] selectors;
-        
-        mapping(bytes4 => address) selectorToAddress; //Selector to facet address
-        mapping(address => bytes4[]) addressToSelectors;
-        mapping(address => mapping(bytes4 => uint)) addressToSelectorToPosition;
-        address[] facetAddresses;
-        mapping(uint => address) indexToFacet;
         address contractOwner;
+        string value;
     }
 
     function getStorage() internal pure returns(DStorage storage DStorageStruct){

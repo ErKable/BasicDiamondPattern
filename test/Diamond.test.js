@@ -33,6 +33,16 @@ describe(`Simple Diamond Contract Test`, function(){
     let ownershipFacet;
     let ownershipFacetAddress;
     let ownershipFacetSelectors;
+    let getValueLib;
+    let getValueLibAddress;
+    let setValueLib;
+    let setValueLibAddress;
+    let getValueFacet;
+    let getValueFacetAddress;
+    let getValueSelectors;
+    let setValueFacet;
+    let setValueFacetAddress;
+    let setValueFacetSelectors;
 
     let owner;
     let ownerAddress;
@@ -202,5 +212,88 @@ describe(`Simple Diamond Contract Test`, function(){
         const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress);
         let facets = await diamLoupe.getFacets()
         console.log(facets)
+    })
+    it(`Should deploy the setValue library and facet`, async function(){
+        setValueLib = await(await ethers.getContractFactory('setValueLib', owner, {
+            libraries:{
+                DiamondStorage: libStorageAddress,
+            }
+        })).deploy()
+        await setValueLib.deployed()
+        setValueLibAddress = setValueLib.address
+        console.log(`setValue lib deployed to ${setValueLibAddress}`)
+
+        setValueFacet = await(await ethers.getContractFactory('setValueFacet', owner, {
+            libraries:{
+                setValueLib: setValueLibAddress,
+            }
+        })).deploy()
+        setValueFacetAddress = setValueFacet.address
+        console.log(`setValue facet deployed to ${setValueFacetAddress}`)
+
+        setValueFacetSelectors = getSelectors(setValueFacet)
+        console.log(`setValue selectors: ${setValueFacetSelectors}`)
+    })
+    it(`Should add the setValue facet to the diamond`, async function(){
+        const diamCut = await ethers.getContractAt('DiamondCutFacet', diamondAddress)
+        let setValueFacetStruct = {
+            facetAddress: setValueFacetAddress,
+            functionSelectors: setValueFacetSelectors,
+            action: 0,
+        } 
+
+        await diamCut.diamondCut([setValueFacetStruct])
+
+        const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress)
+        let contractAddress = await diamLoupe.getFacetAddress(0x93a09352)
+        console.log(`Function selector "0x93a09352" from ${contractAddress} address`)
+        assert.equal(contractAddress, setValueFacetAddress)
+    })
+    it(`Should call the setValue function`, async function(){
+        const setValue = await ethers.getContractAt('setValueFacet', diamondAddress)
+        await setValue.setValue("Hola hola")
+
+        console.log(`Value set`)
+    })
+    it(`Should deploy the getValue library and facet`, async function(){
+        getValueLib = await(await ethers.getContractFactory('getValueLib', owner, {
+            libraries:{
+                DiamondStorage: libStorageAddress,
+            }
+        })).deploy()
+        await getValueLib.deployed()
+        getValueLibAddress = getValueLib.address
+        console.log(`getValue lib deployed to: ${getValueLibAddress}`)
+
+        getValueFacet = await(await ethers.getContractFactory('getValueFacet', owner, {
+            libraries:{
+                getValueLib: getValueLibAddress,
+            }
+        })).deploy()
+        getValueFacetAddress = getValueFacet.address
+        console.log(`getValueFacet deployed to ${getValueFacetAddress}`)
+
+        getValueSelectors = getSelectors(getValueFacet)
+        console.log(`getValue facet selectors: ${getValueSelectors}`)
+    })
+    it(`Should add the getValue facet to diamond`, async function(){
+        const diamCut = await ethers.getContractAt('DiamondCutFacet', diamondAddress)
+        let getValueFacetStruct = {
+            facetAddress: getValueFacetAddress,
+            functionSelectors: getValueSelectors,
+            action: 0,
+        } 
+
+        await diamCut.diamondCut([getValueFacetStruct])
+
+        const diamLoupe = await ethers.getContractAt('DiamondLoupe', diamondAddress)
+        let contractAddress = await diamLoupe.getFacetAddress(0x20965255)
+        console.log(`Function selector "0x20965255" is from contract ${contractAddress}`)
+        assert.equal(contractAddress, getValueFacetAddress)
+    })
+    it(`Should call the getValue function`, async function(){
+        const getValue = await ethers.getContractAt('getValueFacet', diamondAddress)
+        let value = await getValue.getValue()
+        console.log(`Retrieved value: ${value}`)
     })
 })

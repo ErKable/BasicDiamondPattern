@@ -46,7 +46,6 @@ library DiamondCutLib {
             }
             FacetCuAction action = diamondCut[facetIndex].action;
             if(action == FacetCuAction.Add){
-                console.log("Ci arrivo qui?");
                 addFunctions(facetAddress, functionSelectors);
             } else if (action == FacetCuAction.Replace){
                 replaceFunctions(facetAddress, functionSelectors);
